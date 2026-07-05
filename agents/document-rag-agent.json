@@ -1,0 +1,40 @@
+{
+  "id": "document-rag-agent",
+  "label": "Enterprise Document Retrieval",
+  "type": "agent",
+  "agentId": "graphrag_index_query_agent",
+  "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+  "inputs": [
+    "project_id",
+    "TXT documents in projects/{id}/input/",
+    "natural language question",
+    "search method (local/global/drift/basic)"
+  ],
+  "outputs": [
+    "entities.parquet",
+    "community_reports.parquet",
+    "LanceDB embeddings",
+    "natural language answer text"
+  ],
+  "reuseDecision": "reuse",
+  "catalogAgentName": "GraphRAG Index & Query Agent",
+  "rationale": "This agent strongly aligns to indexing and querying enterprise knowledge sources for grounded retrieval.",
+  "explanation": {
+    "purpose": "Retrieve grounded enterprise content from the shared knowledge base and document repository for document or mixed questions.",
+    "role_in_workflow": "When the router selects the document path, this node searches curated enterprise sources for relevant passages, KPI snapshots, and supporting business context. Its output is evidence, not the final answer, and it prepares the material needed for document-grounded reasoning in the next step.",
+    "why_it_exists": "The user specified a common shared knowledge base and wanted answers across enterprise documents, so a retrieval-first document step is required. Reusing the GraphRAG agent fits because it is already designed for indexed enterprise knowledge querying, even though it needs adaptation to this client's document corpus and KPI snapshot content.",
+    "consumes_from": [
+      "Intent Routing Gateway",
+      "document or mixed route",
+      "shared enterprise knowledge base",
+      "enterprise document repository"
+    ],
+    "feeds_into": [
+      "Semantic RAG Answering",
+      "retrieved passages and KB evidence"
+    ],
+    "chat_relationship": "This step addresses the user's requirement to answer from a common shared knowledge base and enterprise documents rather than relying only on raw live systems.",
+    "execution_summary": "Searches the enterprise knowledge base and document repository for relevant grounded evidence."
+  },
+  "status": "scaffold"
+}
