@@ -1,0 +1,40 @@
+{
+  "id": "citation-evidence-agent",
+  "label": "Citation and Evidence Delivery",
+  "type": "agent",
+  "agentId": "graphrag_index_query_agent",
+  "description": "Delivers the answer with optional citations and source evidence available on demand.",
+  "inputs": [
+    "project_id",
+    "TXT documents in projects/{id}/input/",
+    "natural language question",
+    "search method (local/global/drift/basic)"
+  ],
+  "outputs": [
+    "entities.parquet",
+    "community_reports.parquet",
+    "LanceDB embeddings",
+    "natural language answer text"
+  ],
+  "reuseDecision": "adapt",
+  "catalogAgentName": "GraphRAG Index & Query Agent",
+  "rationale": "The same GraphRAG capability can be adapted to expose supporting snippets and document references for evidence-on-demand delivery.",
+  "explanation": {
+    "purpose": "Attach and serve source snippets, document names, and supporting references for optional evidence inspection.",
+    "role_in_workflow": "After the answer is composed, this node prepares the evidence package that supports it. It enables the default response to be delivered immediately while also making citations and snippets available if the manager chooses to inspect the basis for the answer or investigate a flagged conflict.",
+    "why_it_exists": "The user asked to show sources on demand rather than forcing source review every time, so evidence delivery must be optional and separate from the main answer path. Adapting the GraphRAG capability here is logical because it already manages retrieval references and can expose supporting snippets without requiring a new citation subsystem.",
+    "consumes_from": [
+      "Manager Answer Consolidation",
+      "answer plus evidence references"
+    ],
+    "feeds_into": [
+      "Manager Source Review",
+      "Final Response Outcome",
+      "on-demand source inspection",
+      "default answer delivery"
+    ],
+    "chat_relationship": "This directly implements the user's request to show exact source snippets and document names on demand so managers can verify KPI summaries when they want to.",
+    "execution_summary": "Delivers the answer with optional citations and source evidence available on demand."
+  },
+  "status": "scaffold"
+}
