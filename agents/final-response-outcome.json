@@ -1,0 +1,35 @@
+{
+  "id": "final-response-outcome",
+  "label": "Final Response Outcome",
+  "type": "custom",
+  "agentId": null,
+  "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+  "inputs": [
+    "Human review decision",
+    "Approved / rejected outcome for next step"
+  ],
+  "outputs": [
+    "Processed result from: Human review decision",
+    "Processed result from: Approved / rejected outcome for next step"
+  ],
+  "reuseDecision": "build",
+  "catalogAgentName": null,
+  "rationale": "Final channel delivery and fallback rendering are application-specific presentation concerns outside the catalog.",
+  "explanation": {
+    "purpose": "Return the final chatbot result as either a grounded answer with optional evidence and conflict flags or an 'I do not know' fallback.",
+    "role_in_workflow": "This is the terminal delivery step for the workflow. It presents the default answer path directly from citation delivery, or the reviewed result after optional source inspection, and ensures the final output shown in the chatbot matches the confidence and conflict decisions made upstream.",
+    "why_it_exists": "The application needs a dedicated endpoint for rendering the final user-visible outcome, including fallback behavior and optional evidence access. This is built rather than reused because final response formatting, channel delivery, and UI-specific presentation are application concerns outside the reusable agent catalog.",
+    "consumes_from": [
+      "Citation and Evidence Delivery",
+      "Manager Source Review",
+      "default answer delivery",
+      "reviewed answer acceptance"
+    ],
+    "feeds_into": [
+      "Manager chatbot response"
+    ],
+    "chat_relationship": "This step fulfills the user's final experience requirements: provide a manager-friendly summary, include conflict flags when needed, allow source-backed verification, and say 'I do not know' when confidence is insufficient.",
+    "execution_summary": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback."
+  },
+  "status": "scaffold"
+}
