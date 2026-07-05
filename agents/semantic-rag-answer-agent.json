@@ -1,0 +1,34 @@
+{
+  "id": "semantic-rag-answer-agent",
+  "label": "Semantic RAG Answering",
+  "type": "agent",
+  "agentId": "eryl_semantic_rag_agent_chain",
+  "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+  "inputs": [
+    "semantic_question",
+    "Vector_Data routing hints"
+  ],
+  "outputs": [
+    "retrieval-grounded answer",
+    "Semantic-based analysis_type"
+  ],
+  "reuseDecision": "adapt",
+  "catalogAgentName": "Eryl Semantic RAG Agent Chain",
+  "rationale": "The agent already performs semantic retrieval and answering over unstructured documents and needs only light adaptation to enterprise content domains.",
+  "explanation": {
+    "purpose": "Turn retrieved enterprise document evidence into a draft, document-grounded answer for document-heavy or mixed questions.",
+    "role_in_workflow": "This node takes the passages found by document retrieval and performs semantic reasoning over them to extract the relevant business answer. It produces structured findings and a draft answer that can later be compared against live KPI results if the SQL path also ran.",
+    "why_it_exists": "Separating retrieval from answer generation improves grounding and makes it easier to inspect evidence quality before final response assembly. The selected semantic RAG chain already handles unstructured document answering, so adapting it to enterprise KPI and business-document language is faster than building a new document QA component.",
+    "consumes_from": [
+      "Enterprise Document Retrieval",
+      "retrieved passages and KB evidence"
+    ],
+    "feeds_into": [
+      "Conflict Detection and Confidence Gate",
+      "document-grounded findings"
+    ],
+    "chat_relationship": "The user wanted trustworthy answers across enterprise documents, and this step is what converts retrieved document evidence into a usable manager-facing finding while staying grounded in approved content.",
+    "execution_summary": "Generates document-grounded findings and a draft answer from retrieved enterprise content."
+  },
+  "status": "scaffold"
+}
