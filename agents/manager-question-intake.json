@@ -1,0 +1,32 @@
+{
+  "id": "manager-question-intake",
+  "label": "Manager Question Intake",
+  "type": "custom",
+  "agentId": null,
+  "description": "Accepts the manager's question and session context for downstream routing.",
+  "inputs": [
+    "Workflow entry (user request or trigger)"
+  ],
+  "outputs": [
+    "Processed result from: Workflow entry (user request or trigger)"
+  ],
+  "reuseDecision": "build",
+  "catalogAgentName": null,
+  "rationale": "Auto-applied: catalog alternative identified during validation.",
+  "explanation": {
+    "purpose": "Capture the manager's natural-language KPI or business question and pass it into the workflow with session context.",
+    "role_in_workflow": "This is the entry point for every interaction. It receives the manager's question from the chatbot UI, preserves any relevant conversational context, and normalizes the request so downstream routing can decide whether to use documents, live databases, or both.",
+    "why_it_exists": "A dedicated intake step keeps the workflow consistent before branching into retrieval and SQL paths. This node reuses an existing LLM-based intake capability rather than building a custom front-end parsing layer, which is sufficient because the main need here is clean question capture rather than domain-specific reasoning.",
+    "consumes_from": [
+      "Manager chatbot UI input",
+      "session context"
+    ],
+    "feeds_into": [
+      "Intent Routing Gateway",
+      "question text and user context"
+    ],
+    "chat_relationship": "The user asked for a manager-facing chatbot for KPI summaries and business questions, so this step exists to accept those manager questions as the starting point of the system.",
+    "execution_summary": "Accepts the manager's question and session context for downstream routing."
+  },
+  "status": "scaffold"
+}
