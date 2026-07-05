@@ -1,0 +1,36 @@
+{
+  "id": "manager-source-review",
+  "label": "Manager Source Review",
+  "type": "human",
+  "agentId": null,
+  "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+  "inputs": [
+    "entities.parquet",
+    "community_reports.parquet",
+    "LanceDB embeddings",
+    "natural language answer text"
+  ],
+  "outputs": [
+    "Human review decision",
+    "Approved / rejected outcome for next step"
+  ],
+  "reuseDecision": "build",
+  "catalogAgentName": null,
+  "rationale": "This is an optional human inspection step defined by the HITL requirement rather than an automatable catalog agent.",
+  "explanation": {
+    "purpose": "Let the manager optionally inspect cited sources or flagged conflicts before accepting the answer.",
+    "role_in_workflow": "This is an optional human review branch, not a mandatory approval gate. Managers can enter this step when they want to verify evidence, compare conflicting sources, or investigate why the system produced a particular KPI summary.",
+    "why_it_exists": "The transcript specified no mandatory human review in the normal flow, but it also required source visibility on demand and conflict transparency. This step is therefore intentionally built as a human interaction point rather than automated, because the purpose is user inspection and trust-building rather than system processing.",
+    "consumes_from": [
+      "Citation and Evidence Delivery",
+      "on-demand source inspection"
+    ],
+    "feeds_into": [
+      "Final Response Outcome",
+      "reviewed answer acceptance"
+    ],
+    "chat_relationship": "This reflects the user's preference that managers can inspect sources when needed, especially when the system flags disagreements, without making human review mandatory for every answer.",
+    "execution_summary": "Provides an optional manager review step for inspecting citations and flagged conflicts."
+  },
+  "status": "scaffold"
+}
