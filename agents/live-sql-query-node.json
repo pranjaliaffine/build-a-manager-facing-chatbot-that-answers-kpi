@@ -1,0 +1,37 @@
+{
+  "id": "live-sql-query-node",
+  "label": "Live KPI SQL Query",
+  "type": "agent",
+  "agentId": "quin_sql_agent_chain",
+  "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+  "inputs": [
+    "sql_question",
+    "SQL_Meta_Data schema",
+    "optional vision_context block"
+  ],
+  "outputs": [
+    "sql_query results",
+    "SQL-based narrative answer",
+    "analysis_type SQL-based"
+  ],
+  "reuseDecision": "reuse",
+  "catalogAgentName": "Quin SQL Agent Chain",
+  "rationale": "Reuses catalog agent Quin SQL Agent Chain for structured SQL query generation and execution.",
+  "explanation": {
+    "purpose": "Fetch fresh KPI values from structured databases when the question requires live operational data.",
+    "role_in_workflow": "If the router identifies a database or mixed question, this node generates and executes parameterized SQL queries against approved structured systems. It returns current KPI values and structured results that can be compared with knowledge-base content and merged into the final answer.",
+    "why_it_exists": "The transcript explicitly required support for both modes: shared knowledge-base answers and live database lookups at question time for fresh numbers. Reusing the Quin SQL Agent Chain is the strongest fit in the catalog because it already supports SQL generation and execution patterns for KPI-style structured queries.",
+    "consumes_from": [
+      "Intent Routing Gateway",
+      "database or mixed route",
+      "structured databases for live KPI queries"
+    ],
+    "feeds_into": [
+      "Conflict Detection and Confidence Gate",
+      "live KPI query results"
+    ],
+    "chat_relationship": "This step directly satisfies the user's request to support live database access in addition to the shared knowledge base so managers can get fresh KPI numbers when needed.",
+    "execution_summary": "Runs live SQL queries to retrieve current KPI values from structured systems."
+  },
+  "status": "scaffold"
+}
