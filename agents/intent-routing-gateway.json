@@ -1,0 +1,34 @@
+{
+  "id": "intent-routing-gateway",
+  "label": "Intent Routing Gateway",
+  "type": "custom",
+  "agentId": null,
+  "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+  "inputs": [
+    "Processed result from: Workflow entry (user request or trigger)"
+  ],
+  "outputs": [
+    "Processed result from: Processed result from: Workflow entry (user request or trigger)"
+  ],
+  "reuseDecision": "build",
+  "catalogAgentName": null,
+  "rationale": "Auto-applied: catalog alternative identified during validation.",
+  "explanation": {
+    "purpose": "Classify each question as document-focused, database-focused, or mixed and send it to the right retrieval path.",
+    "role_in_workflow": "After intake, this node decides how the question should be answered. It routes document-heavy questions to the enterprise knowledge-base path, KPI freshness questions to the live SQL path, and mixed questions to both so the system can produce one combined answer.",
+    "why_it_exists": "The transcript explicitly confirmed a split design with support for both shared knowledge-base answers and live database lookups. Reusing the GraphRAG query agent here is sensible because the routing problem is mainly semantic classification over enterprise question types, and it avoids building a separate intent model from scratch.",
+    "consumes_from": [
+      "Manager Question Intake",
+      "question text and user context"
+    ],
+    "feeds_into": [
+      "Enterprise Document Retrieval",
+      "Live KPI SQL Query",
+      "document or mixed route",
+      "database or mixed route"
+    ],
+    "chat_relationship": "This directly implements the agreed design from the chat: intent routing should send KPI questions to SQL, document questions to retrieval, and mixed questions to both.",
+    "execution_summary": "Determines whether the question should use document retrieval, live SQL, or both."
+  },
+  "status": "scaffold"
+}
