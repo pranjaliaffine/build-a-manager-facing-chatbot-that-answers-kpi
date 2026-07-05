@@ -1,0 +1,3876 @@
+{
+  "id": "session-1783076414314-khkzgw",
+  "spec": {
+    "status": "ready",
+    "problem_statement": "Build a manager-facing chatbot that answers KPI and business questions across structured databases and enterprise documents using a shared enterprise knowledge base.",
+    "fields": {},
+    "transcript_summary": "Provide internal managers with fast, trustworthy KPI summaries and business answers by combining curated document retrieval with live database lookups, while showing evidence on demand and handling uncertainty safely.",
+    "catalog_hints": [],
+    "architecture_blueprint": "## Provide internal managers with fast, trustworthy KPI summaries and business answers by combining curated document retrieval with live database lookups, while showing evidence on demand and handling uncertainty safely.\n\nBuild a manager-facing chatbot that answers KPI and business questions across structured databases and enterprise documents using a shared enterprise knowledge base.\n\n### Integrations\nShared enterprise knowledge base, Enterprise document repository, Structured databases for live KPI queries\n\n### HITL\nNo mandatory human review in the normal flow. Managers can inspect sources on demand to verify answers or investigate flagged conflicts.",
+    "graph_draft": {
+      "nodes": [
+        {
+          "id": "manager-question-intake",
+          "label": "Manager Question Intake",
+          "type": "agent",
+          "agent_id": "planogram_vision_llm_suite",
+          "description": "Accepts the manager's question and session context for downstream routing.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "intent-routing-gateway",
+          "label": "Intent Routing Gateway",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "document-rag-agent",
+          "label": "Enterprise Document Retrieval",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "semantic-rag-answer-agent",
+          "label": "Semantic RAG Answering",
+          "type": "agent",
+          "agent_id": "eryl_semantic_rag_agent_chain",
+          "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "live-sql-query-node",
+          "label": "Live KPI SQL Query",
+          "type": "agent",
+          "agent_id": "quin_sql_agent_chain",
+          "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "conflict-detection-gateway",
+          "label": "Conflict Detection and Confidence Gate",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "answer-consolidation-agent",
+          "label": "Manager Answer Consolidation",
+          "type": "agent",
+          "agent_id": "final_answer_consolidation_agent",
+          "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "citation-evidence-agent",
+          "label": "Citation and Evidence Delivery",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Delivers the answer with optional citations and source evidence available on demand.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "manager-source-review",
+          "label": "Manager Source Review",
+          "type": "human",
+          "agent_id": null,
+          "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+          "inputs": [],
+          "outputs": []
+        },
+        {
+          "id": "final-response-outcome",
+          "label": "Final Response Outcome",
+          "type": "custom",
+          "agent_id": null,
+          "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+          "inputs": [],
+          "outputs": []
+        }
+      ],
+      "edges": [
+        {
+          "from_id": "manager-question-intake",
+          "to_id": "intent-routing-gateway",
+          "label": "question text and user context"
+        },
+        {
+          "from_id": "intent-routing-gateway",
+          "to_id": "document-rag-agent",
+          "label": "document or mixed route"
+        },
+        {
+          "from_id": "intent-routing-gateway",
+          "to_id": "live-sql-query-node",
+          "label": "database or mixed route"
+        },
+        {
+          "from_id": "document-rag-agent",
+          "to_id": "semantic-rag-answer-agent",
+          "label": "retrieved passages and KB evidence"
+        },
+        {
+          "from_id": "semantic-rag-answer-agent",
+          "to_id": "conflict-detection-gateway",
+          "label": "document-grounded findings"
+        },
+        {
+          "from_id": "live-sql-query-node",
+          "to_id": "conflict-detection-gateway",
+          "label": "live KPI query results"
+        },
+        {
+          "from_id": "conflict-detection-gateway",
+          "to_id": "answer-consolidation-agent",
+          "label": "validated evidence, conflict flags, confidence status"
+        },
+        {
+          "from_id": "answer-consolidation-agent",
+          "to_id": "citation-evidence-agent",
+          "label": "answer plus evidence references"
+        },
+        {
+          "from_id": "citation-evidence-agent",
+          "to_id": "manager-source-review",
+          "label": "on-demand source inspection"
+        },
+        {
+          "from_id": "citation-evidence-agent",
+          "to_id": "final-response-outcome",
+          "label": "default answer delivery"
+        },
+        {
+          "from_id": "manager-source-review",
+          "to_id": "final-response-outcome",
+          "label": "reviewed answer acceptance"
+        }
+      ]
+    },
+    "pipeline_spec": {
+      "problem_statement": "Build a manager-facing chatbot that answers KPI and business questions across structured databases and enterprise documents using a shared enterprise knowledge base.",
+      "goal": "Provide internal managers with fast, trustworthy KPI summaries and business answers by combining curated document retrieval with live database lookups, while showing evidence on demand and handling uncertainty safely.",
+      "inputs": [
+        "Natural language questions from internal managers",
+        "Curated enterprise documents in the shared knowledge base",
+        "Precomputed KPI snapshots in the shared knowledge base",
+        "Live data from structured databases"
+      ],
+      "outputs": [
+        "Manager-facing KPI summaries and business answers",
+        "Optional source snippets and document names on demand",
+        "Conflict flags when live database results and shared knowledge base content disagree",
+        "Explicit 'I do not know' responses when confidence is low"
+      ],
+      "core_components": [
+        "Manager submits natural language question",
+        "Intent router classifies the question as database, document, or mixed",
+        "Document retrieval path searches the shared knowledge base for relevant enterprise content",
+        "SQL query path retrieves fresh KPI values from live structured databases when needed",
+        "Answer composer merges results from one or both paths into a manager-friendly summary",
+        "Conflict detector compares live database results with shared knowledge base content and flags mismatches",
+        "Citation layer exposes source snippets and document names on demand",
+        "Confidence guard returns 'I do not know' when evidence is insufficient or confidence is low"
+      ],
+      "data_flow": "Information enters as a manager's natural language question. The system classifies intent and routes the request to the document retrieval path, the live database query path, or both. The retrieval path searches curated enterprise documents and KPI snapshots in the shared knowledge base, while the database path fetches fresh structured data. The system then compares outputs when both modes are used, detects conflicts, and composes a manager-facing summary. The final response exits as an answer with optional source evidence on demand, plus a conflict flag or an 'I do not know' fallback when confidence is low.",
+      "model_requirements": "Use AI to classify question intent, retrieve relevant evidence, summarise results for managers, and compose a final answer grounded in retrieved content and query results. The model must avoid unsupported answers and defer with 'I do not know' when confidence is below threshold.",
+      "integrations": [
+        "Shared enterprise knowledge base",
+        "Enterprise document repository",
+        "Structured databases for live KPI queries"
+      ],
+      "hitl": "No mandatory human review in the normal flow. Managers can inspect sources on demand to verify answers or investigate flagged conflicts.",
+      "validations": [
+        "Intent routing between document, database, or mixed questions",
+        "Confidence threshold for answerability",
+        "Source citation availability on demand",
+        "Conflict detection between live database results and shared knowledge base content",
+        "Show both sources when disagreement exists",
+        "Return summary even when conflict is flagged"
+      ],
+      "assumptions": [
+        "Primary users are internal managers",
+        "Primary use case is manager KPI summaries rather than deep analyst workflows",
+        "A common shared knowledge base exists or will be created",
+        "Both curated snapshots and live database access are allowed",
+        "Managers prefer cautious behavior over speculative answers"
+      ],
+      "constraints": [
+        "Answers should be grounded in approved enterprise content and live data",
+        "System must not fabricate answers when evidence is weak",
+        "Source visibility is on demand rather than always shown",
+        "Conflicting results must be surfaced rather than silently resolved"
+      ],
+      "edge_cases": [
+        "Question mixes document policy context with live KPI values",
+        "Live database result conflicts with shared knowledge base snapshot",
+        "No relevant document or data is found",
+        "Retrieved evidence is weak or ambiguous",
+        "Source systems are temporarily unavailable"
+      ],
+      "unresolved_questions": [
+        "Which specific databases are in scope for live querying",
+        "Which document repositories and file types belong in the shared knowledge base",
+        "How freshness is defined for KPI snapshots versus live data",
+        "What confidence threshold should trigger 'I do not know'",
+        "What level of mismatch should count as a conflict",
+        "What access controls and permissions managers need across data and documents",
+        "Expected scale, concurrency, and response time targets"
+      ]
+    }
+  },
+  "architecture_plan": {
+    "graph": {
+      "nodes": [
+        {
+          "id": "manager-question-intake",
+          "label": "Manager Question Intake",
+          "type": "custom",
+          "agent_id": null,
+          "description": "Accepts the manager's question and session context for downstream routing.",
+          "inputs": [
+            "Workflow entry (user request or trigger)"
+          ],
+          "outputs": [
+            "Processed result from: Workflow entry (user request or trigger)"
+          ]
+        },
+        {
+          "id": "intent-routing-gateway",
+          "label": "Intent Routing Gateway",
+          "type": "custom",
+          "agent_id": null,
+          "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+          "inputs": [
+            "Processed result from: Workflow entry (user request or trigger)"
+          ],
+          "outputs": [
+            "Processed result from: Processed result from: Workflow entry (user request or trigger)"
+          ]
+        },
+        {
+          "id": "document-rag-agent",
+          "label": "Enterprise Document Retrieval",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+          "inputs": [
+            "project_id",
+            "TXT documents in projects/{id}/input/",
+            "natural language question",
+            "search method (local/global/drift/basic)"
+          ],
+          "outputs": [
+            "entities.parquet",
+            "community_reports.parquet",
+            "LanceDB embeddings",
+            "natural language answer text"
+          ]
+        },
+        {
+          "id": "semantic-rag-answer-agent",
+          "label": "Semantic RAG Answering",
+          "type": "agent",
+          "agent_id": "eryl_semantic_rag_agent_chain",
+          "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+          "inputs": [
+            "semantic_question",
+            "Vector_Data routing hints"
+          ],
+          "outputs": [
+            "retrieval-grounded answer",
+            "Semantic-based analysis_type"
+          ]
+        },
+        {
+          "id": "live-sql-query-node",
+          "label": "Live KPI SQL Query",
+          "type": "agent",
+          "agent_id": "quin_sql_agent_chain",
+          "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+          "inputs": [
+            "sql_question",
+            "SQL_Meta_Data schema",
+            "optional vision_context block"
+          ],
+          "outputs": [
+            "sql_query results",
+            "SQL-based narrative answer",
+            "analysis_type SQL-based"
+          ]
+        },
+        {
+          "id": "conflict-detection-gateway",
+          "label": "Conflict Detection and Confidence Gate",
+          "type": "custom",
+          "agent_id": null,
+          "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+          "inputs": [
+            "retrieval-grounded answer",
+            "Semantic-based analysis_type"
+          ],
+          "outputs": [
+            "Processed result from: retrieval-grounded answer",
+            "Processed result from: Semantic-based analysis_type"
+          ]
+        },
+        {
+          "id": "answer-consolidation-agent",
+          "label": "Manager Answer Consolidation",
+          "type": "agent",
+          "agent_id": "final_answer_consolidation_agent",
+          "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+          "inputs": [
+            "User query",
+            "intermediate JSON with count_analysis and generic_analysis"
+          ],
+          "outputs": [
+            "final_answer",
+            "reasoning",
+            "user_query"
+          ]
+        },
+        {
+          "id": "citation-evidence-agent",
+          "label": "Citation and Evidence Delivery",
+          "type": "agent",
+          "agent_id": "graphrag_index_query_agent",
+          "description": "Delivers the answer with optional citations and source evidence available on demand.",
+          "inputs": [
+            "project_id",
+            "TXT documents in projects/{id}/input/",
+            "natural language question",
+            "search method (local/global/drift/basic)"
+          ],
+          "outputs": [
+            "entities.parquet",
+            "community_reports.parquet",
+            "LanceDB embeddings",
+            "natural language answer text"
+          ]
+        },
+        {
+          "id": "manager-source-review",
+          "label": "Manager Source Review",
+          "type": "human",
+          "agent_id": null,
+          "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+          "inputs": [
+            "entities.parquet",
+            "community_reports.parquet",
+            "LanceDB embeddings",
+            "natural language answer text"
+          ],
+          "outputs": [
+            "Human review decision",
+            "Approved / rejected outcome for next step"
+          ]
+        },
+        {
+          "id": "final-response-outcome",
+          "label": "Final Response Outcome",
+          "type": "custom",
+          "agent_id": null,
+          "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+          "inputs": [
+            "Human review decision",
+            "Approved / rejected outcome for next step"
+          ],
+          "outputs": [
+            "Processed result from: Human review decision",
+            "Processed result from: Approved / rejected outcome for next step"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from_id": "manager-question-intake",
+          "to_id": "intent-routing-gateway",
+          "label": "question text and user context"
+        },
+        {
+          "from_id": "intent-routing-gateway",
+          "to_id": "document-rag-agent",
+          "label": "document or mixed route"
+        },
+        {
+          "from_id": "intent-routing-gateway",
+          "to_id": "live-sql-query-node",
+          "label": "database or mixed route"
+        },
+        {
+          "from_id": "document-rag-agent",
+          "to_id": "semantic-rag-answer-agent",
+          "label": "retrieved passages and KB evidence"
+        },
+        {
+          "from_id": "semantic-rag-answer-agent",
+          "to_id": "conflict-detection-gateway",
+          "label": "document-grounded findings"
+        },
+        {
+          "from_id": "live-sql-query-node",
+          "to_id": "conflict-detection-gateway",
+          "label": "live KPI query results"
+        },
+        {
+          "from_id": "conflict-detection-gateway",
+          "to_id": "answer-consolidation-agent",
+          "label": "validated evidence, conflict flags, confidence status"
+        },
+        {
+          "from_id": "answer-consolidation-agent",
+          "to_id": "citation-evidence-agent",
+          "label": "answer plus evidence references"
+        },
+        {
+          "from_id": "citation-evidence-agent",
+          "to_id": "manager-source-review",
+          "label": "on-demand source inspection"
+        },
+        {
+          "from_id": "citation-evidence-agent",
+          "to_id": "final-response-outcome",
+          "label": "default answer delivery"
+        },
+        {
+          "from_id": "manager-source-review",
+          "to_id": "final-response-outcome",
+          "label": "reviewed answer acceptance"
+        }
+      ]
+    },
+    "reuse_decisions": [
+      {
+        "node_id": "manager-question-intake",
+        "node_label": "Manager Question Intake",
+        "decision": "build",
+        "agent_id": null,
+        "agent_name": null,
+        "rationale": "Auto-applied: catalog alternative identified during validation.",
+        "catalog_score": 0.5527124999999999,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "outputs": [
+          "Processed result from: Workflow entry (user request or trigger)"
+        ],
+        "inputs": [
+          "Workflow entry (user request or trigger)"
+        ]
+      },
+      {
+        "node_id": "intent-routing-gateway",
+        "node_label": "Intent Routing Gateway",
+        "decision": "build",
+        "agent_id": null,
+        "agent_name": null,
+        "rationale": "Auto-applied: catalog alternative identified during validation.",
+        "catalog_score": 0.765,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "outputs": [
+          "Processed result from: Processed result from: Workflow entry (user request or trigger)"
+        ],
+        "inputs": [
+          "Processed result from: Workflow entry (user request or trigger)"
+        ]
+      },
+      {
+        "node_id": "document-rag-agent",
+        "node_label": "Enterprise Document Retrieval",
+        "decision": "reuse",
+        "agent_id": "graphrag_index_query_agent",
+        "agent_name": "GraphRAG Index & Query Agent",
+        "rationale": "This agent strongly aligns to indexing and querying enterprise knowledge sources for grounded retrieval.",
+        "catalog_score": 0.765,
+        "raw_search_score": 0.03095238283276558,
+        "weak_overall_coverage": true,
+        "inputs": [
+          "project_id",
+          "TXT documents in projects/{id}/input/",
+          "natural language question",
+          "search method (local/global/drift/basic)"
+        ],
+        "outputs": [
+          "entities.parquet",
+          "community_reports.parquet",
+          "LanceDB embeddings",
+          "natural language answer text"
+        ]
+      },
+      {
+        "node_id": "semantic-rag-answer-agent",
+        "node_label": "Semantic RAG Answering",
+        "decision": "adapt",
+        "agent_id": "eryl_semantic_rag_agent_chain",
+        "agent_name": "Eryl Semantic RAG Agent Chain",
+        "rationale": "The agent already performs semantic retrieval and answering over unstructured documents and needs only light adaptation to enterprise content domains.",
+        "catalog_score": 0.65025,
+        "raw_search_score": 0.03079839050769806,
+        "weak_overall_coverage": true,
+        "inputs": [
+          "semantic_question",
+          "Vector_Data routing hints"
+        ],
+        "outputs": [
+          "retrieval-grounded answer",
+          "Semantic-based analysis_type"
+        ]
+      },
+      {
+        "node_id": "live-sql-query-node",
+        "node_label": "Live KPI SQL Query",
+        "decision": "reuse",
+        "agent_id": "quin_sql_agent_chain",
+        "agent_name": "Quin SQL Agent Chain",
+        "rationale": "Reuses catalog agent Quin SQL Agent Chain for structured SQL query generation and execution.",
+        "catalog_score": 0.85,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "inputs": [
+          "sql_question",
+          "SQL_Meta_Data schema",
+          "optional vision_context block"
+        ],
+        "outputs": [
+          "sql_query results",
+          "SQL-based narrative answer",
+          "analysis_type SQL-based"
+        ]
+      },
+      {
+        "node_id": "conflict-detection-gateway",
+        "node_label": "Conflict Detection and Confidence Gate",
+        "decision": "build",
+        "agent_id": null,
+        "agent_name": null,
+        "rationale": "Auto-applied: catalog alternative identified during validation.",
+        "catalog_score": 0.765,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "outputs": [
+          "Processed result from: retrieval-grounded answer",
+          "Processed result from: Semantic-based analysis_type"
+        ],
+        "inputs": [
+          "retrieval-grounded answer",
+          "Semantic-based analysis_type"
+        ]
+      },
+      {
+        "node_id": "answer-consolidation-agent",
+        "node_label": "Manager Answer Consolidation",
+        "decision": "adapt",
+        "agent_id": "final_answer_consolidation_agent",
+        "agent_name": "Final Answer Consolidation Agent",
+        "rationale": "The consolidation pattern fits well and can be adapted from its current domain to merge enterprise document and KPI outputs into a final response.",
+        "catalog_score": 0.5527124999999999,
+        "raw_search_score": 0.011111111380159855,
+        "weak_overall_coverage": true,
+        "inputs": [
+          "User query",
+          "intermediate JSON with count_analysis and generic_analysis"
+        ],
+        "outputs": [
+          "final_answer",
+          "reasoning",
+          "user_query"
+        ]
+      },
+      {
+        "node_id": "citation-evidence-agent",
+        "node_label": "Citation and Evidence Delivery",
+        "decision": "adapt",
+        "agent_id": "graphrag_index_query_agent",
+        "agent_name": "GraphRAG Index & Query Agent",
+        "rationale": "The same GraphRAG capability can be adapted to expose supporting snippets and document references for evidence-on-demand delivery.",
+        "catalog_score": 0.765,
+        "raw_search_score": 0.03095238283276558,
+        "weak_overall_coverage": true,
+        "inputs": [
+          "project_id",
+          "TXT documents in projects/{id}/input/",
+          "natural language question",
+          "search method (local/global/drift/basic)"
+        ],
+        "outputs": [
+          "entities.parquet",
+          "community_reports.parquet",
+          "LanceDB embeddings",
+          "natural language answer text"
+        ]
+      },
+      {
+        "node_id": "manager-source-review",
+        "node_label": "Manager Source Review",
+        "decision": "build",
+        "agent_id": null,
+        "agent_name": null,
+        "rationale": "This is an optional human inspection step defined by the HITL requirement rather than an automatable catalog agent.",
+        "catalog_score": 0,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "outputs": [
+          "Human review decision",
+          "Approved / rejected outcome for next step"
+        ],
+        "inputs": [
+          "entities.parquet",
+          "community_reports.parquet",
+          "LanceDB embeddings",
+          "natural language answer text"
+        ]
+      },
+      {
+        "node_id": "final-response-outcome",
+        "node_label": "Final Response Outcome",
+        "decision": "build",
+        "agent_id": null,
+        "agent_name": null,
+        "rationale": "Final channel delivery and fallback rendering are application-specific presentation concerns outside the catalog.",
+        "catalog_score": 0,
+        "raw_search_score": null,
+        "weak_overall_coverage": false,
+        "outputs": [
+          "Processed result from: Human review decision",
+          "Processed result from: Approved / rejected outcome for next step"
+        ],
+        "inputs": [
+          "Human review decision",
+          "Approved / rejected outcome for next step"
+        ]
+      }
+    ],
+    "catalog_matches": [
+      {
+        "agent_id": "graphrag_index_query_agent",
+        "name": "GraphRAG Index & Query Agent",
+        "category": "Document & Data",
+        "origin_client": "JPMorgan Chase (JPMC)",
+        "origin_project": "JPMC KYC Risk Pre-Screening (UBO GraphRAG)",
+        "function_summary": "Indexes per-project KYC documents into a knowledge graph with entity/community extraction and embeddings; answers analyst questions via local, global, drift, or basic search methods.",
+        "score": 0.765,
+        "raw_search_score": 0.03095238283276558,
+        "weak_overall_coverage": true,
+        "matched_for": "Build a manager-facing chatbot that answers KPI and business questions across st"
+      },
+      {
+        "agent_id": "kyc_risk_report_generator",
+        "name": "KYC Risk Report Generator",
+        "category": "Quality & Compliance",
+        "origin_client": "JPMorgan Chase (JPMC)",
+        "origin_project": "JPMC KYC Risk Pre-Screening (UBO GraphRAG)",
+        "function_summary": "Generates downloadable Word (.docx) KYC risk assessment reports with KPI summary table, section scores, UBO details, override status, and AI reasoning narratives.",
+        "score": 0.765,
+        "raw_search_score": 0.0277777798473835,
+        "weak_overall_coverage": true,
+        "matched_for": "Provide internal managers with fast, trustworthy KPI summaries and business answ"
+      },
+      {
+        "agent_id": "eryl_semantic_rag_agent_chain",
+        "name": "Eryl Semantic RAG Agent Chain",
+        "category": "Document & Data",
+        "origin_client": "Mars",
+        "origin_project": "Mars Sales Genie (Copilot) / Unified View",
+        "function_summary": "Retrieves and answers from indexed retail policy and unstructured documents (Chocolate_Confectionery_Retail_Policy.docx, emails, guidelines) using Azure AI Search vector + semantic retrieval.",
+        "score": 0.65025,
+        "raw_search_score": 0.03079839050769806,
+        "weak_overall_coverage": true,
+        "matched_for": "Build a manager-facing chatbot that answers KPI and business questions across st"
+      },
+      {
+        "agent_id": "planogram_vision_llm_suite",
+        "name": "Planogram Vision LLM Suite",
+        "category": "Quality & Compliance",
+        "origin_client": "Mars",
+        "origin_project": "Mars Sales Genie (Copilot) / Unified View",
+        "function_summary": "Azure OpenAI vision functions for shelf-level product extraction, row counting, generic row description, daily KPI JSON, and final natural-language shelf answers after Roboflow cropping.",
+        "score": 0.5527124999999999,
+        "raw_search_score": 0.013698630034923553,
+        "weak_overall_coverage": true,
+        "matched_for": "Provide internal managers with fast, trustworthy KPI summaries and business answ"
+      },
+      {
+        "agent_id": "final_answer_consolidation_agent",
+        "name": "Final Answer Consolidation Agent",
+        "category": "Sales & Revenue",
+        "origin_client": "Affine Analytics",
+        "origin_project": "Merchandising Vision Agent",
+        "function_summary": "Consolidates count and generic row-level analyses into a single natural-language answer based on task_type routing.",
+        "score": 0.5527124999999999,
+        "raw_search_score": 0.011111111380159855,
+        "weak_overall_coverage": true,
+        "matched_for": "Manager submits natural language question \u2192 Intent router classifies the questio"
+      },
+      {
+        "agent_id": "quin_sql_agent_chain",
+        "name": "Quin SQL Agent Chain",
+        "category": "Sales & Revenue",
+        "origin_client": "Mars",
+        "origin_project": "Mars Sales Genie (Copilot) / Unified View",
+        "function_summary": "AutoGen multi-agent chain that generates, executes, and critiques SQL Server queries on mars schema tables (Mars_Sales_Data, shelf_visit, retail_planogram_stocks, etc.) and returns structured sales/inventory insights.",
+        "score": 0.85,
+        "raw_search_score": 0,
+        "weak_overall_coverage": false,
+        "matched_for": "sql-query-step"
+      }
+    ],
+    "summary_markdown": "This architecture implements a manager-facing chatbot that answers KPI and business questions by combining retrieval from the shared enterprise knowledge base and enterprise document repository with live queries against structured databases. The orchestration model is a routed mixed-mode flow: the system first classifies each question as document, database, or mixed, then executes the relevant retrieval paths, compares outputs, and returns a grounded answer with optional evidence and explicit conflict signaling.\n\nThe main flow starts with manager question intake, then an intent-routing gateway sends requests to the document path, the database path, or both. On the document side, the GraphRAG Index & Query Agent is reused for enterprise knowledge-base retrieval, followed by an adapted Eryl Semantic RAG Agent Chain to produce document-grounded findings. In parallel when needed, a custom live SQL node retrieves fresh KPI values from structured databases. A custom conflict-and-confidence gateway then checks for disagreement between live data and knowledge-base content and enforces the requirement to return \"I do not know\" when evidence is insufficient. The adapted Final Answer Consolidation Agent composes the manager-friendly response, and an adapted GraphRAG evidence node supports source snippets and document names on demand.\n\nReuse is catalog-first: 4 of 10 nodes are direct reuse/adapt processing agents, and the core processing chain is anchored on catalog assets for retrieval, semantic answering, consolidation, and citation delivery. Custom build is reserved for capabilities not covered by the catalog: conversational intake, intent routing, live SQL execution, and conflict/confidence governance. The optional human-in-the-loop behavior is represented as manager source review after citation delivery, matching the requirement that there is no mandatory human review in the normal flow but managers can inspect sources or flagged conflicts on demand.\n\nKey risks are safe SQL generation against live systems, maintaining grounding across mixed document and database answers, and calibrating the confidence threshold so the system neither fabricates nor over-defers. Additional implementation care is needed to preserve source traceability across both integrations and to ensure conflict flags are surfaced clearly rather than silently resolved.",
+    "open_questions": [
+      "Which structured database platforms must the live KPI query node support, and is SQL generation allowed or should it use only predefined semantic query templates?",
+      "Should the shared enterprise knowledge base already exist as an indexed corpus, or must the solution also include ingestion and refresh pipelines for enterprise documents?",
+      "What confidence threshold and conflict severity rules should trigger the 'I do not know' fallback versus a flagged answer with both sources shown?",
+      "Are managers authenticated with role-based access controls that restrict which documents and KPI domains can be retrieved per user?"
+    ],
+    "validation": {
+      "overall": "warn",
+      "pass_count": 14,
+      "warn_count": 13,
+      "fail_count": 0,
+      "structural_fail_count": 0,
+      "unresolved_actionable_count": 13,
+      "can_approve": false,
+      "approval_hint": "13 issue(s) still need a fix or review.",
+      "items": [
+        {
+          "level": "pass",
+          "code": "has_nodes",
+          "message": "Graph has 10 components and 11 connections.",
+          "node_id": null,
+          "finding_id": "has_nodes:_",
+          "finding_key": "has_nodes:_",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Manager Question Intake' is weak overall (top raw search score 0.0137).",
+          "node_id": "manager-question-intake",
+          "finding_id": "weak_overall_coverage:manager-question-intake",
+          "finding_key": "weak_overall_coverage:manager-question-intake",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:manager-question-intake",
+              "action": "set_decision",
+              "node_id": "manager-question-intake",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:manager-question-intake",
+              "action": "set_decision",
+              "node_id": "manager-question-intake",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:manager-question-intake",
+              "action": "set_decision",
+              "node_id": "manager-question-intake",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:manager-question-intake",
+              "action": "set_decision",
+              "node_id": "manager-question-intake",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:manager-question-intake",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'Planogram Vision LLM Suite' aligns with this step.",
+          "node_id": "manager-question-intake",
+          "finding_id": "catalog_fit:manager-question-intake",
+          "finding_key": "catalog_fit:manager-question-intake",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Intent Routing Gateway' is weak overall (top raw search score 0.0310).",
+          "node_id": "intent-routing-gateway",
+          "finding_id": "weak_overall_coverage:intent-routing-gateway",
+          "finding_key": "weak_overall_coverage:intent-routing-gateway",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:intent-routing-gateway",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_catalog_fit",
+          "message": "'Intent Routing Gateway' may not match catalog agent capabilities (review fit).",
+          "node_id": "intent-routing-gateway",
+          "finding_id": "weak_catalog_fit:intent-routing-gateway",
+          "finding_key": "weak_catalog_fit:intent-routing-gateway",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_catalog_fit:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_catalog_fit:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_catalog_fit:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_catalog_fit:intent-routing-gateway",
+              "action": "set_decision",
+              "node_id": "intent-routing-gateway",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_catalog_fit:intent-routing-gateway",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Enterprise Document Retrieval' is weak overall (top raw search score 0.0310).",
+          "node_id": "document-rag-agent",
+          "finding_id": "weak_overall_coverage:document-rag-agent",
+          "finding_key": "weak_overall_coverage:document-rag-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:document-rag-agent",
+              "action": "set_decision",
+              "node_id": "document-rag-agent",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:document-rag-agent",
+              "action": "set_decision",
+              "node_id": "document-rag-agent",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:document-rag-agent",
+              "action": "set_decision",
+              "node_id": "document-rag-agent",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:document-rag-agent",
+              "action": "set_decision",
+              "node_id": "document-rag-agent",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:document-rag-agent",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'GraphRAG Index & Query Agent' aligns with this step.",
+          "node_id": "document-rag-agent",
+          "finding_id": "catalog_fit:document-rag-agent",
+          "finding_key": "catalog_fit:document-rag-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Semantic RAG Answering' is weak overall (top raw search score 0.0308).",
+          "node_id": "semantic-rag-answer-agent",
+          "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+          "finding_key": "weak_overall_coverage:semantic-rag-answer-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+              "action": "set_decision",
+              "node_id": "semantic-rag-answer-agent",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+              "action": "set_decision",
+              "node_id": "semantic-rag-answer-agent",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+              "action": "set_decision",
+              "node_id": "semantic-rag-answer-agent",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+              "action": "set_decision",
+              "node_id": "semantic-rag-answer-agent",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:semantic-rag-answer-agent",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'Eryl Semantic RAG Agent Chain' aligns with this step.",
+          "node_id": "semantic-rag-answer-agent",
+          "finding_id": "catalog_fit:semantic-rag-answer-agent",
+          "finding_key": "catalog_fit:semantic-rag-answer-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'Quin SQL Agent Chain' aligns with this step.",
+          "node_id": "live-sql-query-node",
+          "finding_id": "catalog_fit:live-sql-query-node",
+          "finding_key": "catalog_fit:live-sql-query-node",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Conflict Detection and Confidence Gate' is weak overall (top raw search score 0.0310).",
+          "node_id": "conflict-detection-gateway",
+          "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+          "finding_key": "weak_overall_coverage:conflict-detection-gateway",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+              "action": "set_decision",
+              "node_id": "conflict-detection-gateway",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+              "action": "set_decision",
+              "node_id": "conflict-detection-gateway",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+              "action": "set_decision",
+              "node_id": "conflict-detection-gateway",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+              "action": "set_decision",
+              "node_id": "conflict-detection-gateway",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:conflict-detection-gateway",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'GraphRAG Index & Query Agent' aligns with this step.",
+          "node_id": "conflict-detection-gateway",
+          "finding_id": "catalog_fit:conflict-detection-gateway",
+          "finding_key": "catalog_fit:conflict-detection-gateway",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Manager Answer Consolidation' is weak overall (top raw search score 0.0111).",
+          "node_id": "answer-consolidation-agent",
+          "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+          "finding_key": "weak_overall_coverage:answer-consolidation-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+              "action": "set_decision",
+              "node_id": "answer-consolidation-agent",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+              "action": "set_decision",
+              "node_id": "answer-consolidation-agent",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+              "action": "set_decision",
+              "node_id": "answer-consolidation-agent",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+              "action": "set_decision",
+              "node_id": "answer-consolidation-agent",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:answer-consolidation-agent",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "catalog_fit",
+          "message": "Catalog agent 'Final Answer Consolidation Agent' aligns with this step.",
+          "node_id": "answer-consolidation-agent",
+          "finding_id": "catalog_fit:answer-consolidation-agent",
+          "finding_key": "catalog_fit:answer-consolidation-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_overall_coverage",
+          "message": "Catalog coverage for 'Citation and Evidence Delivery' is weak overall (top raw search score 0.0310).",
+          "node_id": "citation-evidence-agent",
+          "finding_id": "weak_overall_coverage:citation-evidence-agent",
+          "finding_key": "weak_overall_coverage:citation-evidence-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_overall_coverage:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_overall_coverage:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_overall_coverage:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_overall_coverage:citation-evidence-agent",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "weak_catalog_fit",
+          "message": "'Citation and Evidence Delivery' may not match catalog agent capabilities (review fit).",
+          "node_id": "citation-evidence-agent",
+          "finding_id": "weak_catalog_fit:citation-evidence-agent",
+          "finding_key": "weak_catalog_fit:citation-evidence-agent",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [
+            {
+              "id": "switch_catalog_graphrag_index_query_agent",
+              "label": "Try: GraphRAG Index & Query Agent",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_catalog_fit:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "graphrag_index_query_agent",
+              "agent_name": "GraphRAG Index & Query Agent",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_kyc_risk_report_generator",
+              "label": "Try: KYC Risk Report Generator",
+              "description": "Switch to alternate catalog agent (score 0.77).",
+              "finding_id": "weak_catalog_fit:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "kyc_risk_report_generator",
+              "agent_name": "KYC Risk Report Generator",
+              "catalog_score": 0.765,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "switch_catalog_eryl_semantic_rag_agent_chain",
+              "label": "Try: Eryl Semantic RAG Agent Chain",
+              "description": "Switch to alternate catalog agent (score 0.65).",
+              "finding_id": "weak_catalog_fit:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "reuse",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "agent_name": "Eryl Semantic RAG Agent Chain",
+              "catalog_score": 0.65025,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "mark_build",
+              "label": "Build custom instead",
+              "description": "Drop catalog reuse for this step.",
+              "finding_id": "weak_catalog_fit:citation-evidence-agent",
+              "action": "set_decision",
+              "node_id": "citation-evidence-agent",
+              "decision": "build",
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "acknowledge_fit",
+              "label": "Accept current match",
+              "description": "Keep assignment; you reviewed fit manually.",
+              "finding_id": "weak_catalog_fit:citation-evidence-agent",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "build_ok",
+          "message": "Custom build for 'Manager Source Review' \u2014 confirm no catalog alternative.",
+          "node_id": "manager-source-review",
+          "finding_id": "build_ok:manager-source-review",
+          "finding_key": "build_ok:manager-source-review",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "build_ok",
+          "message": "Custom build for 'Final Response Outcome' \u2014 confirm no catalog alternative.",
+          "node_id": "final-response-outcome",
+          "finding_id": "build_ok:final-response-outcome",
+          "finding_key": "build_ok:final-response-outcome",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "hitl_present",
+          "message": "Human-in-the-loop step present as specified.",
+          "node_id": null,
+          "finding_id": "hitl_present:_",
+          "finding_key": "hitl_present:_",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "integrations_reflected",
+          "message": "Key integrations from spec appear in the architecture.",
+          "node_id": null,
+          "finding_id": "integrations_reflected:_",
+          "finding_key": "integrations_reflected:_",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "use_case_aligned",
+          "message": "Architecture text overlaps with stated use case.",
+          "node_id": null,
+          "finding_id": "use_case_aligned:_",
+          "finding_key": "use_case_aligned:_",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "flow_documented",
+          "message": "Architectural flow was confirmed in the interview \u2014 compare visually to canvas.",
+          "node_id": null,
+          "finding_id": "flow_documented:_",
+          "finding_key": "flow_documented:_",
+          "blocks_approval": false,
+          "help_text": "Validation checks structure and spec overlap, not full business correctness.",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "open_question",
+          "message": "Which structured database platforms must the live KPI query node support, and is SQL generation allowed or should it use only predefined semantic query templates?",
+          "node_id": null,
+          "finding_id": "open_question:0",
+          "finding_key": "open_question:0",
+          "blocks_approval": false,
+          "help_text": "Resolve or acknowledge open planning questions.",
+          "remediations": [
+            {
+              "id": "resolve_question",
+              "label": "Mark question resolved",
+              "description": "Remove this open question from the plan.",
+              "finding_id": "open_question:0",
+              "action": "remove_open_question",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": "Which structured database platforms must the live KPI query node support, and is SQL generation allowed or should it use only predefined semantic query templates?",
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "keep_question",
+              "label": "Keep tracking this question",
+              "description": "Leave open; acknowledge you are aware.",
+              "finding_id": "open_question:0",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "open_question",
+          "message": "Should the shared enterprise knowledge base already exist as an indexed corpus, or must the solution also include ingestion and refresh pipelines for enterprise documents?",
+          "node_id": null,
+          "finding_id": "open_question:1",
+          "finding_key": "open_question:1",
+          "blocks_approval": false,
+          "help_text": "Resolve or acknowledge open planning questions.",
+          "remediations": [
+            {
+              "id": "resolve_question",
+              "label": "Mark question resolved",
+              "description": "Remove this open question from the plan.",
+              "finding_id": "open_question:1",
+              "action": "remove_open_question",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": "Should the shared enterprise knowledge base already exist as an indexed corpus, or must the solution also include ingestion and refresh pipelines for enterprise documents?",
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "keep_question",
+              "label": "Keep tracking this question",
+              "description": "Leave open; acknowledge you are aware.",
+              "finding_id": "open_question:1",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "open_question",
+          "message": "What confidence threshold and conflict severity rules should trigger the 'I do not know' fallback versus a flagged answer with both sources shown?",
+          "node_id": null,
+          "finding_id": "open_question:2",
+          "finding_key": "open_question:2",
+          "blocks_approval": false,
+          "help_text": "Resolve or acknowledge open planning questions.",
+          "remediations": [
+            {
+              "id": "resolve_question",
+              "label": "Mark question resolved",
+              "description": "Remove this open question from the plan.",
+              "finding_id": "open_question:2",
+              "action": "remove_open_question",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": "What confidence threshold and conflict severity rules should trigger the 'I do not know' fallback versus a flagged answer with both sources shown?",
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "keep_question",
+              "label": "Keep tracking this question",
+              "description": "Leave open; acknowledge you are aware.",
+              "finding_id": "open_question:2",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "warn",
+          "code": "open_question",
+          "message": "Are managers authenticated with role-based access controls that restrict which documents and KPI domains can be retrieved per user?",
+          "node_id": null,
+          "finding_id": "open_question:3",
+          "finding_key": "open_question:3",
+          "blocks_approval": false,
+          "help_text": "Resolve or acknowledge open planning questions.",
+          "remediations": [
+            {
+              "id": "resolve_question",
+              "label": "Mark question resolved",
+              "description": "Remove this open question from the plan.",
+              "finding_id": "open_question:3",
+              "action": "remove_open_question",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": "Are managers authenticated with role-based access controls that restrict which documents and KPI domains can be retrieved per user?",
+              "edge_from": null,
+              "edge_to": null
+            },
+            {
+              "id": "keep_question",
+              "label": "Keep tracking this question",
+              "description": "Leave open; acknowledge you are aware.",
+              "finding_id": "open_question:3",
+              "action": "acknowledge",
+              "node_id": null,
+              "decision": null,
+              "agent_id": null,
+              "agent_name": null,
+              "catalog_score": null,
+              "gateway_label": null,
+              "question_text": null,
+              "edge_from": null,
+              "edge_to": null
+            }
+          ],
+          "resolved": false,
+          "resolution": null
+        },
+        {
+          "level": "pass",
+          "code": "validation_scope",
+          "message": "Automated checks cover structure, catalog ids, and spec overlap \u2014 not full business proof.",
+          "node_id": null,
+          "finding_id": "validation_scope:_",
+          "finding_key": "validation_scope:_",
+          "blocks_approval": false,
+          "help_text": "",
+          "remediations": [],
+          "resolved": false,
+          "resolution": null
+        }
+      ],
+      "node_status": {
+        "manager-question-intake": "warn",
+        "intent-routing-gateway": "warn",
+        "document-rag-agent": "warn",
+        "semantic-rag-answer-agent": "warn",
+        "live-sql-query-node": "pass",
+        "conflict-detection-gateway": "warn",
+        "answer-consolidation-agent": "warn",
+        "citation-evidence-agent": "warn",
+        "manager-source-review": "pass",
+        "final-response-outcome": "pass"
+      }
+    },
+    "validation_resolutions": {},
+    "architecture_approved": false,
+    "node_explanations": {
+      "manager-question-intake": {
+        "purpose": "Capture the manager's natural-language KPI or business question and pass it into the workflow with session context.",
+        "role_in_workflow": "This is the entry point for every interaction. It receives the manager's question from the chatbot UI, preserves any relevant conversational context, and normalizes the request so downstream routing can decide whether to use documents, live databases, or both.",
+        "why_it_exists": "A dedicated intake step keeps the workflow consistent before branching into retrieval and SQL paths. This node reuses an existing LLM-based intake capability rather than building a custom front-end parsing layer, which is sufficient because the main need here is clean question capture rather than domain-specific reasoning.",
+        "consumes_from": [
+          "Manager chatbot UI input",
+          "session context"
+        ],
+        "feeds_into": [
+          "Intent Routing Gateway",
+          "question text and user context"
+        ],
+        "chat_relationship": "The user asked for a manager-facing chatbot for KPI summaries and business questions, so this step exists to accept those manager questions as the starting point of the system.",
+        "execution_summary": "Accepts the manager's question and session context for downstream routing."
+      },
+      "intent-routing-gateway": {
+        "purpose": "Classify each question as document-focused, database-focused, or mixed and send it to the right retrieval path.",
+        "role_in_workflow": "After intake, this node decides how the question should be answered. It routes document-heavy questions to the enterprise knowledge-base path, KPI freshness questions to the live SQL path, and mixed questions to both so the system can produce one combined answer.",
+        "why_it_exists": "The transcript explicitly confirmed a split design with support for both shared knowledge-base answers and live database lookups. Reusing the GraphRAG query agent here is sensible because the routing problem is mainly semantic classification over enterprise question types, and it avoids building a separate intent model from scratch.",
+        "consumes_from": [
+          "Manager Question Intake",
+          "question text and user context"
+        ],
+        "feeds_into": [
+          "Enterprise Document Retrieval",
+          "Live KPI SQL Query",
+          "document or mixed route",
+          "database or mixed route"
+        ],
+        "chat_relationship": "This directly implements the agreed design from the chat: intent routing should send KPI questions to SQL, document questions to retrieval, and mixed questions to both.",
+        "execution_summary": "Determines whether the question should use document retrieval, live SQL, or both."
+      },
+      "document-rag-agent": {
+        "purpose": "Retrieve grounded enterprise content from the shared knowledge base and document repository for document or mixed questions.",
+        "role_in_workflow": "When the router selects the document path, this node searches curated enterprise sources for relevant passages, KPI snapshots, and supporting business context. Its output is evidence, not the final answer, and it prepares the material needed for document-grounded reasoning in the next step.",
+        "why_it_exists": "The user specified a common shared knowledge base and wanted answers across enterprise documents, so a retrieval-first document step is required. Reusing the GraphRAG agent fits because it is already designed for indexed enterprise knowledge querying, even though it needs adaptation to this client's document corpus and KPI snapshot content.",
+        "consumes_from": [
+          "Intent Routing Gateway",
+          "document or mixed route",
+          "shared enterprise knowledge base",
+          "enterprise document repository"
+        ],
+        "feeds_into": [
+          "Semantic RAG Answering",
+          "retrieved passages and KB evidence"
+        ],
+        "chat_relationship": "This step addresses the user's requirement to answer from a common shared knowledge base and enterprise documents rather than relying only on raw live systems.",
+        "execution_summary": "Searches the enterprise knowledge base and document repository for relevant grounded evidence."
+      },
+      "semantic-rag-answer-agent": {
+        "purpose": "Turn retrieved enterprise document evidence into a draft, document-grounded answer for document-heavy or mixed questions.",
+        "role_in_workflow": "This node takes the passages found by document retrieval and performs semantic reasoning over them to extract the relevant business answer. It produces structured findings and a draft answer that can later be compared against live KPI results if the SQL path also ran.",
+        "why_it_exists": "Separating retrieval from answer generation improves grounding and makes it easier to inspect evidence quality before final response assembly. The selected semantic RAG chain already handles unstructured document answering, so adapting it to enterprise KPI and business-document language is faster than building a new document QA component.",
+        "consumes_from": [
+          "Enterprise Document Retrieval",
+          "retrieved passages and KB evidence"
+        ],
+        "feeds_into": [
+          "Conflict Detection and Confidence Gate",
+          "document-grounded findings"
+        ],
+        "chat_relationship": "The user wanted trustworthy answers across enterprise documents, and this step is what converts retrieved document evidence into a usable manager-facing finding while staying grounded in approved content.",
+        "execution_summary": "Generates document-grounded findings and a draft answer from retrieved enterprise content."
+      },
+      "live-sql-query-node": {
+        "purpose": "Fetch fresh KPI values from structured databases when the question requires live operational data.",
+        "role_in_workflow": "If the router identifies a database or mixed question, this node generates and executes parameterized SQL queries against approved structured systems. It returns current KPI values and structured results that can be compared with knowledge-base content and merged into the final answer.",
+        "why_it_exists": "The transcript explicitly required support for both modes: shared knowledge-base answers and live database lookups at question time for fresh numbers. Reusing the Quin SQL Agent Chain is the strongest fit in the catalog because it already supports SQL generation and execution patterns for KPI-style structured queries.",
+        "consumes_from": [
+          "Intent Routing Gateway",
+          "database or mixed route",
+          "structured databases for live KPI queries"
+        ],
+        "feeds_into": [
+          "Conflict Detection and Confidence Gate",
+          "live KPI query results"
+        ],
+        "chat_relationship": "This step directly satisfies the user's request to support live database access in addition to the shared knowledge base so managers can get fresh KPI numbers when needed.",
+        "execution_summary": "Runs live SQL queries to retrieve current KPI values from structured systems."
+      },
+      "conflict-detection-gateway": {
+        "purpose": "Compare document-derived findings and live KPI results, flag disagreements, and decide whether evidence is strong enough to answer.",
+        "role_in_workflow": "This node sits after both evidence-producing branches and acts as the trust-control layer. It checks for mismatches between live database outputs and knowledge-base content, preserves both when they disagree, and determines whether the system should proceed with an answer or fall back to 'I do not know' due to insufficient confidence.",
+        "why_it_exists": "The user explicitly asked for two safety behaviors: show both and flag when sources conflict, and say 'I do not know' when the system cannot answer confidently. Reusing the GraphRAG-based logic here is appropriate because the task is evidence comparison and confidence gating rather than heavy domain-specific generation.",
+        "consumes_from": [
+          "Semantic RAG Answering",
+          "Live KPI SQL Query",
+          "document-grounded findings",
+          "live KPI query results"
+        ],
+        "feeds_into": [
+          "Manager Answer Consolidation",
+          "validated evidence, conflict flags, confidence status"
+        ],
+        "chat_relationship": "This is the direct implementation of the user's trust rules: support both modes, show both and flag when they disagree, still give a summary, and return 'I do not know' when confidence is low.",
+        "execution_summary": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results."
+      },
+      "answer-consolidation-agent": {
+        "purpose": "Merge validated evidence, live KPI outputs, and any conflict or confidence signals into one manager-friendly summary.",
+        "role_in_workflow": "Once the system knows what evidence is available and whether conflicts exist, this node composes the actual response text. It turns raw retrieval outputs and SQL results into a concise manager-facing answer that can include both perspectives, note any mismatch, and respect low-confidence fallback decisions.",
+        "why_it_exists": "Managers asked for quick KPI summaries rather than analyst-style raw outputs, so a dedicated consolidation layer is needed to translate technical evidence into executive-friendly language. Adapting an existing answer consolidation pattern is more efficient than building a new summarizer, while still allowing customization for conflict-aware KPI responses.",
+        "consumes_from": [
+          "Conflict Detection and Confidence Gate",
+          "validated evidence, conflict flags, confidence status"
+        ],
+        "feeds_into": [
+          "Citation and Evidence Delivery",
+          "answer plus evidence references"
+        ],
+        "chat_relationship": "This step addresses the user's requirement to give a manager-facing summary even when there is a conflict, rather than stopping the flow for review first.",
+        "execution_summary": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags."
+      },
+      "citation-evidence-agent": {
+        "purpose": "Attach and serve source snippets, document names, and supporting references for optional evidence inspection.",
+        "role_in_workflow": "After the answer is composed, this node prepares the evidence package that supports it. It enables the default response to be delivered immediately while also making citations and snippets available if the manager chooses to inspect the basis for the answer or investigate a flagged conflict.",
+        "why_it_exists": "The user asked to show sources on demand rather than forcing source review every time, so evidence delivery must be optional and separate from the main answer path. Adapting the GraphRAG capability here is logical because it already manages retrieval references and can expose supporting snippets without requiring a new citation subsystem.",
+        "consumes_from": [
+          "Manager Answer Consolidation",
+          "answer plus evidence references"
+        ],
+        "feeds_into": [
+          "Manager Source Review",
+          "Final Response Outcome",
+          "on-demand source inspection",
+          "default answer delivery"
+        ],
+        "chat_relationship": "This directly implements the user's request to show exact source snippets and document names on demand so managers can verify KPI summaries when they want to.",
+        "execution_summary": "Delivers the answer with optional citations and source evidence available on demand."
+      },
+      "manager-source-review": {
+        "purpose": "Let the manager optionally inspect cited sources or flagged conflicts before accepting the answer.",
+        "role_in_workflow": "This is an optional human review branch, not a mandatory approval gate. Managers can enter this step when they want to verify evidence, compare conflicting sources, or investigate why the system produced a particular KPI summary.",
+        "why_it_exists": "The transcript specified no mandatory human review in the normal flow, but it also required source visibility on demand and conflict transparency. This step is therefore intentionally built as a human interaction point rather than automated, because the purpose is user inspection and trust-building rather than system processing.",
+        "consumes_from": [
+          "Citation and Evidence Delivery",
+          "on-demand source inspection"
+        ],
+        "feeds_into": [
+          "Final Response Outcome",
+          "reviewed answer acceptance"
+        ],
+        "chat_relationship": "This reflects the user's preference that managers can inspect sources when needed, especially when the system flags disagreements, without making human review mandatory for every answer.",
+        "execution_summary": "Provides an optional manager review step for inspecting citations and flagged conflicts."
+      },
+      "final-response-outcome": {
+        "purpose": "Return the final chatbot result as either a grounded answer with optional evidence and conflict flags or an 'I do not know' fallback.",
+        "role_in_workflow": "This is the terminal delivery step for the workflow. It presents the default answer path directly from citation delivery, or the reviewed result after optional source inspection, and ensures the final output shown in the chatbot matches the confidence and conflict decisions made upstream.",
+        "why_it_exists": "The application needs a dedicated endpoint for rendering the final user-visible outcome, including fallback behavior and optional evidence access. This is built rather than reused because final response formatting, channel delivery, and UI-specific presentation are application concerns outside the reusable agent catalog.",
+        "consumes_from": [
+          "Citation and Evidence Delivery",
+          "Manager Source Review",
+          "default answer delivery",
+          "reviewed answer acceptance"
+        ],
+        "feeds_into": [
+          "Manager chatbot response"
+        ],
+        "chat_relationship": "This step fulfills the user's final experience requirements: provide a manager-friendly summary, include conflict flags when needed, allow source-backed verification, and say 'I do not know' when confidence is insufficient.",
+        "execution_summary": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback."
+      }
+    },
+    "logic_validation": {
+      "is_valid": false,
+      "summary": "Workflow covers the main dual-path pattern but has major capability mismatches and misses explicit handling for low-confidence/no-evidence cases and on-demand citation behavior.",
+      "issues": [
+        "Manager Question Intake is assigned to a vision/planogram agent that does not fit plain chatbot intake or enterprise QA context.",
+        "Intent Routing Gateway uses a retrieval agent for classification/routing; this is a weak fit for the required document/database/mixed intent decision.",
+        "Conflict Detection and Confidence Gate is overloaded onto a retrieval agent and does not explicitly model the required 'I do not know' fallback when evidence is insufficient or systems are unavailable.",
+        "Citation flow is modeled as a mandatory post-processing step on every answer rather than an optional on-demand evidence branch, which conflicts with the requirement that source visibility is on demand.",
+        "There is no explicit path for no-results / weak-evidence / source-unavailable cases before answer composition, so the workflow can still proceed to answer generation without sufficient grounding.",
+        "Agent reuse/build decisions are too optimistic for routing and trust-governance steps; these should be custom-built or adapted governance components rather than GraphRAG reuse."
+      ],
+      "suggestions": [
+        "Use a custom intake/router layer for question normalization and intent classification, with GraphRAG reserved for retrieval tasks.",
+        "Separate confidence gating from conflict detection and make the fallback decision explicit before final answer delivery.",
+        "Make citation delivery conditional or user-invoked after the main answer, not a mandatory step in the default path.",
+        "Preserve both KB and live DB evidence into the final answer when conflicts exist, while still returning a summary.",
+        "Add explicit handling for unavailable integrations and no-evidence cases so the system returns 'I do not know' safely.",
+        "Keep Quin SQL for live KPI lookup and GraphRAG/Eryl for document retrieval and grounded synthesis, but build custom governance around them."
+      ],
+      "operations": [
+        {
+          "operation": "replace_agent",
+          "reference_node": "manager-question-intake",
+          "agent_id": "BUILD_NEW"
+        },
+        {
+          "operation": "replace_agent",
+          "reference_node": "intent-routing-gateway",
+          "agent_id": "BUILD_NEW"
+        },
+        {
+          "operation": "replace_agent",
+          "reference_node": "conflict-detection-gateway",
+          "agent_id": "BUILD_NEW"
+        },
+        {
+          "operation": "insert_node",
+          "reference_node": "answer-consolidation-agent",
+          "position": "after",
+          "node_type": "agent",
+          "label": "Confidence Fallback Decision",
+          "agent_id": "BUILD_NEW"
+        },
+        {
+          "operation": "remove_edge",
+          "from": "answer-consolidation-agent",
+          "to": "citation-evidence-agent"
+        }
+      ],
+      "recommended_workflow": {
+        "description": "The corrected flow accepts a manager question, classifies it into document, database, or mixed, then runs the appropriate retrieval/query paths. A custom trust layer evaluates evidence sufficiency, detects conflicts, and either sends grounded inputs to answer composition or returns an explicit 'I do not know'; citations are exposed only when requested, while conflicts still surface with both source sets available.",
+        "steps": [
+          {
+            "id": "question-intake",
+            "label": "Manager Question Intake",
+            "type": "custom",
+            "decision": "build",
+            "agent_name": null
+          },
+          {
+            "id": "intent-router",
+            "label": "Intent Router",
+            "type": "custom",
+            "decision": "build",
+            "agent_name": null
+          },
+          {
+            "id": "kb-document-retrieval",
+            "label": "Knowledge Base and Document Retrieval",
+            "type": "agent",
+            "decision": "reuse",
+            "agent_name": "GraphRAG Index & Query Agent"
+          },
+          {
+            "id": "document-grounded-synthesis",
+            "label": "Document Grounded Synthesis",
+            "type": "agent",
+            "decision": "adapt",
+            "agent_name": "Eryl Semantic RAG Agent Chain"
+          },
+          {
+            "id": "live-kpi-sql",
+            "label": "Live KPI SQL Query",
+            "type": "agent",
+            "decision": "reuse",
+            "agent_name": "Quin SQL Agent Chain"
+          },
+          {
+            "id": "trust-governance",
+            "label": "Conflict Detection and Evidence Sufficiency Check",
+            "type": "custom",
+            "decision": "build",
+            "agent_name": null
+          },
+          {
+            "id": "answer-composer",
+            "label": "Manager Answer Composer",
+            "type": "agent",
+            "decision": "adapt",
+            "agent_name": "Final Answer Consolidation Agent"
+          },
+          {
+            "id": "fallback-decision",
+            "label": "Confidence Fallback Decision",
+            "type": "custom",
+            "decision": "build",
+            "agent_name": null
+          },
+          {
+            "id": "citation-on-demand",
+            "label": "Citation and Evidence On Demand",
+            "type": "agent",
+            "decision": "adapt",
+            "agent_name": "GraphRAG Index & Query Agent"
+          },
+          {
+            "id": "final-response",
+            "label": "Final Response",
+            "type": "custom",
+            "decision": "build",
+            "agent_name": null
+          }
+        ],
+        "edges": [
+          {
+            "from": "question-intake",
+            "to": "intent-router",
+            "label": "normalized question and user context"
+          },
+          {
+            "from": "intent-router",
+            "to": "kb-document-retrieval",
+            "label": "document or mixed"
+          },
+          {
+            "from": "intent-router",
+            "to": "live-kpi-sql",
+            "label": "database or mixed"
+          },
+          {
+            "from": "kb-document-retrieval",
+            "to": "document-grounded-synthesis",
+            "label": "retrieved KB and document evidence"
+          },
+          {
+            "from": "document-grounded-synthesis",
+            "to": "trust-governance",
+            "label": "document findings and citations"
+          },
+          {
+            "from": "live-kpi-sql",
+            "to": "trust-governance",
+            "label": "live KPI results"
+          },
+          {
+            "from": "trust-governance",
+            "to": "answer-composer",
+            "label": "grounded evidence plus conflict flags"
+          },
+          {
+            "from": "answer-composer",
+            "to": "fallback-decision",
+            "label": "draft manager answer with evidence metadata"
+          },
+          {
+            "from": "fallback-decision",
+            "to": "final-response",
+            "label": "answer or explicit I do not know"
+          },
+          {
+            "from": "final-response",
+            "to": "citation-on-demand",
+            "label": "manager requests sources"
+          },
+          {
+            "from": "citation-on-demand",
+            "to": "final-response",
+            "label": "source snippets and document names"
+          }
+        ]
+      },
+      "post_fix_status": "partial",
+      "operations_applied": 3,
+      "operations_undone": 2
+    },
+    "fix_log": [
+      {
+        "issue": "Manager Question Intake is assigned to a vision/planogram agent that does not fit plain chatbot intake or enterprise QA context.",
+        "operation_type": "replace_agent",
+        "label": "manager-question-intake",
+        "before": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "agent",
+              "agent_id": "planogram_vision_llm_suite",
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "verifier_result": "pass",
+        "verifier_reason": "Verification passed.",
+        "timestamp": "2026-07-03T11:05:54.784961+00:00"
+      },
+      {
+        "issue": "Intent Routing Gateway uses a retrieval agent for classification/routing; this is a weak fit for the required document/database/mixed intent decision.",
+        "operation_type": "replace_agent",
+        "label": "intent-routing-gateway",
+        "before": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "verifier_result": "pass",
+        "verifier_reason": "Verification passed.",
+        "timestamp": "2026-07-03T11:05:54.903488+00:00"
+      },
+      {
+        "issue": "Conflict Detection and Confidence Gate is overloaded onto a retrieval agent and does not explicitly model the required 'I do not know' fallback when evidence is insufficient or systems are unavailable.",
+        "operation_type": "replace_agent",
+        "label": "conflict-detection-gateway",
+        "before": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "verifier_result": "pass",
+        "verifier_reason": "Verification passed.",
+        "timestamp": "2026-07-03T11:05:55.022387+00:00"
+      },
+      {
+        "issue": "Citation flow is modeled as a mandatory post-processing step on every answer rather than an optional on-demand evidence branch, which conflicts with the requirement that source visibility is on demand.",
+        "operation_type": "insert_node",
+        "label": "Confidence Fallback Decision",
+        "before": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "verifier_result": "fail/undone",
+        "verifier_reason": "Graph has 2 disconnected groups (sizes: 10, 1).",
+        "timestamp": "2026-07-03T11:05:55.102763+00:00"
+      },
+      {
+        "issue": "There is no explicit path for no-results / weak-evidence / source-unavailable cases before answer composition, so the workflow can still proceed to answer generation without sufficient grounding.",
+        "operation_type": "remove_edge",
+        "label": null,
+        "before": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "after": {
+          "nodes": [
+            {
+              "id": "manager-question-intake",
+              "label": "Manager Question Intake",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Accepts the manager's question and session context for downstream routing.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "intent-routing-gateway",
+              "label": "Intent Routing Gateway",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Determines whether the question should use document retrieval, live SQL, or both.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "document-rag-agent",
+              "label": "Enterprise Document Retrieval",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Searches the enterprise knowledge base and document repository for relevant grounded evidence.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "semantic-rag-answer-agent",
+              "label": "Semantic RAG Answering",
+              "type": "agent",
+              "agent_id": "eryl_semantic_rag_agent_chain",
+              "description": "Generates document-grounded findings and a draft answer from retrieved enterprise content.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "live-sql-query-node",
+              "label": "Live KPI SQL Query",
+              "type": "agent",
+              "agent_id": "quin_sql_agent_chain",
+              "description": "Runs live SQL queries to retrieve current KPI values from structured systems.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "conflict-detection-gateway",
+              "label": "Conflict Detection and Confidence Gate",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "answer-consolidation-agent",
+              "label": "Manager Answer Consolidation",
+              "type": "agent",
+              "agent_id": "final_answer_consolidation_agent",
+              "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "citation-evidence-agent",
+              "label": "Citation and Evidence Delivery",
+              "type": "agent",
+              "agent_id": "graphrag_index_query_agent",
+              "description": "Delivers the answer with optional citations and source evidence available on demand.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "manager-source-review",
+              "label": "Manager Source Review",
+              "type": "human",
+              "agent_id": null,
+              "description": "Provides an optional manager review step for inspecting citations and flagged conflicts.",
+              "inputs": [],
+              "outputs": []
+            },
+            {
+              "id": "final-response-outcome",
+              "label": "Final Response Outcome",
+              "type": "custom",
+              "agent_id": null,
+              "description": "Returns the final manager-facing answer, conflict notice, citations option, or 'I do not know' fallback.",
+              "inputs": [],
+              "outputs": []
+            }
+          ],
+          "edges": [
+            {
+              "from_id": "manager-question-intake",
+              "to_id": "intent-routing-gateway",
+              "label": "question text and user context"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "document-rag-agent",
+              "label": "document or mixed route"
+            },
+            {
+              "from_id": "intent-routing-gateway",
+              "to_id": "live-sql-query-node",
+              "label": "database or mixed route"
+            },
+            {
+              "from_id": "document-rag-agent",
+              "to_id": "semantic-rag-answer-agent",
+              "label": "retrieved passages and KB evidence"
+            },
+            {
+              "from_id": "semantic-rag-answer-agent",
+              "to_id": "conflict-detection-gateway",
+              "label": "document-grounded findings"
+            },
+            {
+              "from_id": "live-sql-query-node",
+              "to_id": "conflict-detection-gateway",
+              "label": "live KPI query results"
+            },
+            {
+              "from_id": "conflict-detection-gateway",
+              "to_id": "answer-consolidation-agent",
+              "label": "validated evidence, conflict flags, confidence status"
+            },
+            {
+              "from_id": "answer-consolidation-agent",
+              "to_id": "citation-evidence-agent",
+              "label": "answer plus evidence references"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "manager-source-review",
+              "label": "on-demand source inspection"
+            },
+            {
+              "from_id": "citation-evidence-agent",
+              "to_id": "final-response-outcome",
+              "label": "default answer delivery"
+            },
+            {
+              "from_id": "manager-source-review",
+              "to_id": "final-response-outcome",
+              "label": "reviewed answer acceptance"
+            }
+          ]
+        },
+        "verifier_result": "fail/undone",
+        "verifier_reason": "Graph has 2 disconnected groups (sizes: 7, 3).",
+        "timestamp": "2026-07-03T11:05:55.184652+00:00"
+      }
+    ],
+    "post_fix_status": "partial"
+  },
+  "exportedAt": "2026-07-05T18:52:03.863306+00:00"
+}
