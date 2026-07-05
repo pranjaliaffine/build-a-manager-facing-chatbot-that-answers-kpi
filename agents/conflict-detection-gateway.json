@@ -1,0 +1,36 @@
+{
+  "id": "conflict-detection-gateway",
+  "label": "Conflict Detection and Confidence Gate",
+  "type": "custom",
+  "agentId": null,
+  "description": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results.",
+  "inputs": [
+    "retrieval-grounded answer",
+    "Semantic-based analysis_type"
+  ],
+  "outputs": [
+    "Processed result from: retrieval-grounded answer",
+    "Processed result from: Semantic-based analysis_type"
+  ],
+  "reuseDecision": "build",
+  "catalogAgentName": null,
+  "rationale": "Auto-applied: catalog alternative identified during validation.",
+  "explanation": {
+    "purpose": "Compare document-derived findings and live KPI results, flag disagreements, and decide whether evidence is strong enough to answer.",
+    "role_in_workflow": "This node sits after both evidence-producing branches and acts as the trust-control layer. It checks for mismatches between live database outputs and knowledge-base content, preserves both when they disagree, and determines whether the system should proceed with an answer or fall back to 'I do not know' due to insufficient confidence.",
+    "why_it_exists": "The user explicitly asked for two safety behaviors: show both and flag when sources conflict, and say 'I do not know' when the system cannot answer confidently. Reusing the GraphRAG-based logic here is appropriate because the task is evidence comparison and confidence gating rather than heavy domain-specific generation.",
+    "consumes_from": [
+      "Semantic RAG Answering",
+      "Live KPI SQL Query",
+      "document-grounded findings",
+      "live KPI query results"
+    ],
+    "feeds_into": [
+      "Manager Answer Consolidation",
+      "validated evidence, conflict flags, confidence status"
+    ],
+    "chat_relationship": "This is the direct implementation of the user's trust rules: support both modes, show both and flag when they disagree, still give a summary, and return 'I do not know' when confidence is low.",
+    "execution_summary": "Checks evidence sufficiency and flags conflicts between knowledge-base content and live KPI results."
+  },
+  "status": "scaffold"
+}
