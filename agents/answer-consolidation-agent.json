@@ -1,0 +1,35 @@
+{
+  "id": "answer-consolidation-agent",
+  "label": "Manager Answer Consolidation",
+  "type": "agent",
+  "agentId": "final_answer_consolidation_agent",
+  "description": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags.",
+  "inputs": [
+    "User query",
+    "intermediate JSON with count_analysis and generic_analysis"
+  ],
+  "outputs": [
+    "final_answer",
+    "reasoning",
+    "user_query"
+  ],
+  "reuseDecision": "adapt",
+  "catalogAgentName": "Final Answer Consolidation Agent",
+  "rationale": "The consolidation pattern fits well and can be adapted from its current domain to merge enterprise document and KPI outputs into a final response.",
+  "explanation": {
+    "purpose": "Merge validated evidence, live KPI outputs, and any conflict or confidence signals into one manager-friendly summary.",
+    "role_in_workflow": "Once the system knows what evidence is available and whether conflicts exist, this node composes the actual response text. It turns raw retrieval outputs and SQL results into a concise manager-facing answer that can include both perspectives, note any mismatch, and respect low-confidence fallback decisions.",
+    "why_it_exists": "Managers asked for quick KPI summaries rather than analyst-style raw outputs, so a dedicated consolidation layer is needed to translate technical evidence into executive-friendly language. Adapting an existing answer consolidation pattern is more efficient than building a new summarizer, while still allowing customization for conflict-aware KPI responses.",
+    "consumes_from": [
+      "Conflict Detection and Confidence Gate",
+      "validated evidence, conflict flags, confidence status"
+    ],
+    "feeds_into": [
+      "Citation and Evidence Delivery",
+      "answer plus evidence references"
+    ],
+    "chat_relationship": "This step addresses the user's requirement to give a manager-facing summary even when there is a conflict, rather than stopping the flow for review first.",
+    "execution_summary": "Builds a manager-friendly final answer from validated evidence, confidence status, and conflict flags."
+  },
+  "status": "scaffold"
+}
